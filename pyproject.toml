@@ -7,7 +7,13 @@ authors = [
     { name = "Daniel-Abrams", email = "danlab1104@gmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "networkx>=3.7",
+    "openpyxl>=3.1.5",
+    "pandas>=3.1.1",
+    "pathlib>=1.0.1",
+    "pyarrow>=26.0.1",
+]
 
 [project.scripts]
 cse559p1 = "cse559p1:main"
