@@ -4,6 +4,7 @@ from pathlib import Path
 path_to_raw_data = Path("raw_datasets")
 path_to_curated_data = Path("curated_data")
 
+# Gets a curated gene panel for each cell line, which includes landmark genes and drug targets.
 def mapCellLinesToTargetGenes():
     # Get raw data
     response_df = pd.read_excel(path_to_raw_data / "GDSC2_fitted_dose_response_27Oct23.xlsx")
@@ -46,7 +47,8 @@ def mapCellLinesToTargetGenes():
     print(f"Result is dataframe with {cell_line_df.shape[0]} items and {cell_line_df.shape[1]} genes")
     cell_line_df.to_csv(path_to_curated_data / "CellLinesLandmarkGenes.csv", index=False)
 
-
+# Maps the gene panel of a cell line to a drug and the respective lnc50 concentration
+# of that drug needed to kill the cell.
 def mapCellLineTolnc50():
     
     response_df = pd.read_excel(path_to_raw_data / "GDSC2_fitted_dose_response_27Oct23.xlsx")
@@ -58,6 +60,3 @@ def mapCellLineTolnc50():
     
     print(f"Result is dataframe with {response_cell_line_merge.shape[0]} items and {response_cell_line_merge.shape[1]} columns")
     response_cell_line_merge.to_parquet(path_to_curated_data / "ResponseCellLineMerge.parquet", index=False)
-
-
-mapCellLineTolnc50()

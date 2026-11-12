@@ -222,3 +222,4 @@ __marimo__/
 # Datasets
 raw_datasets/
 curated_data/
+graphs/
