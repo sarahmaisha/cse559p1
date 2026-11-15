@@ -61,7 +61,7 @@ def make_gene_protein_networks():
             genes = row.iloc[1:]
             for gene, tpm in genes.items():
                 norm_tpm = normalize_tpm_value(tpm, tpm_max, tpm_min)
-                normalized_gene_scores.append((gene, {"tpm_norm" : norm_tpm}))
+                normalized_gene_scores.append((gene, {"tpm_norm" : round(norm_tpm,3)}))
 
             write_gene_protein_network(sanger_id, normalized_gene_scores)
              
