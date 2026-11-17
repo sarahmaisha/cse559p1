@@ -40,8 +40,63 @@ def build_edge_index(edges):
     weights = edges["weight"].to_list()
     weight_list = weights + weights
 
-    # turn into tensors for pytorch geometric
+    # turn into tensors for pyTorch Geometric
     edge_index = torch.tensor([from_list, to_list], dtype=torch.long)
     edge_weight = torch.tensor(weight_list, dtype=torch.float)
 
     return edge_index, edge_weight
+
+def summarize_graph(edge_index, edge_weight, genes, idx_dict, targets):
+    print("Number of genes:", len(genes))
+    print("Number of edges:", edge_index.shape[1] // 2)
+    print("Edge weight stats: min", edge_weight.min().item(), "max", edge_weight.max().item(), "mean", edge_weight.mean().item())
+    degree = torch.bincount(edge_index[0], minlength=len(genes))
+    print("Average degree:", degree.float().mean().item())
+    print("Isolated genes:", (degree == 0).sum().item())
+
+    for name in targets:
+        position = idx_dict[name]
+        deg = degree[position].item()
+        print(f"{name}: degree {deg}")
+
+
+
+
+
+if __name__ == "__main__":
+    def section(title):
+        print("\n" + "-" * 50)
+        print(title)
+        print("-" * 50)
+
+    # ---- 1. gene order ----
+    section("1. Gene order (load_gene_order)")
+    genes, idx = load_gene_order("data/fake/CellLinesLandmarkGenes.csv")
+    print("Number of genes:   ", len(genes))
+    print("First 3 genes:     ", genes[:3])
+    print("Position of G5:    ", idx["G5 (1005)"])
+    print("Position of G60:   ", idx["G60 (1060)"])
+
+    # ---- 2. edges table ----
+    section("2. Edges table (load_edges)")
+    edges = load_edges("data/fake/curated_interaction_edges.json", idx)
+    print("Shape (rows, cols):", edges.shape)
+    print("\nFirst 5 rows:")
+    print(edges.head())
+    print("\nColumn types:")
+    print(edges.dtypes)
+
+    # ---- 3. edge_index tensors ----
+    section("3. Edge tensors (build_edge_index)")
+    edge_index, edge_weight = build_edge_index(edges)
+    print("edge_index shape:  ", edge_index.shape)
+    print("edge_weight shape: ", edge_weight.shape)
+    print("\nFirst 3 edges (original direction):")
+    print(edge_index[:, :3])
+    print("\nSame 3 edges (reversed direction, should be the rows above flipped):")
+    print(edge_index[:, 800:803])
+
+    # ---- 4. graph summary ----
+    section("4. Graph summary (summarize_graph)")
+    summarize_graph(edge_index, edge_weight, genes, idx, ["G5 (1005)", "G42 (1042)", "G100 (1100)"])
+
