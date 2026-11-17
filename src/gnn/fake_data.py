@@ -4,10 +4,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-"""
-Fake data generation for testing and debugging GNN models.
-"""
-
 # set the random seed for reproducibility
 rng = np.random.default_rng(42)
 
@@ -68,7 +64,7 @@ y_A = 3 - 1.0 * z[:, 5]  - 0.5 * z[:, nbrs_A].mean(axis=1) + rng.normal(0, 1, n)
 y_B = 3 - 1.0 * z[:, 42] + rng.normal(0, 1, n)
 y_C = 3 + rng.normal(0, 1, n)
 
-
+# randomly drop 10% of the responses for each drug to simulate missing data
 parts = []
 for drug, y in {"drugA": y_A, "drugB": y_B, "drugC": y_C}.items():
     tested = rng.random(n) > 0.10
@@ -86,9 +82,10 @@ drug_list = pd.DataFrame({
     "targets": ["G5", "G42", "G100"],
     "control_label": ["positive", "positive", "negative"],
 })
+# export to csv
 drug_list.to_csv(out / "drug_list.csv", index=False)
 
-
+# debugging prints
 print("G5 neighbors:", [genes[k] for k in nbrs_A])
 print(responses.groupby("drug").size())
 print("G5 vs drugA:  ", np.corrcoef(values[:, 5], y_A)[0, 1])
