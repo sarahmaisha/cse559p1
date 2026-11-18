@@ -81,11 +81,11 @@ if __name__ == "__main__":
 
   model.train()
   for step in range(500):
-      pred = model(x_small).squeeze(-1)
-      loss = F.mse_loss(pred, y_small)
-      optimizer.zero_grad()
-      loss.backward()
-      optimizer.step()
+      pred = model(x_small).squeeze(-1)       # predict
+      loss = F.mse_loss(pred, y_small)        # measure error
+      optimizer.zero_grad()                   # clear old gradients
+      loss.backward()                         # gradient calculations
+      optimizer.step()                        # apply gradients, move the weights
       if step % 50 == 0:
           print(f"step {step:3d}   loss {loss.item():.4f}")
 
