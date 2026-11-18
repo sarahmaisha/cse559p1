@@ -60,9 +60,6 @@ def summarize_graph(edge_index, edge_weight, genes, idx_dict, targets):
         print(f"{name}: degree {deg}")
 
 
-
-
-
 if __name__ == "__main__":
     def section(title):
         print("\n" + "-" * 50)
