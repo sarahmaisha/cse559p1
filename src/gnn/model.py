@@ -85,7 +85,7 @@ if __name__ == "__main__":
       loss = F.mse_loss(pred, y_small)        # measure error
       optimizer.zero_grad()                   # clear old gradients
       loss.backward()                         # gradient calculations
-      optimizer.step()                        # apply gradients, move the weights
+      optimizer.step()                        # apply gradients,move the weights
       if step % 50 == 0:
           print(f"step {step:3d}   loss {loss.item():.4f}")
 

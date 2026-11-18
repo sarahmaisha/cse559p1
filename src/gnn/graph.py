@@ -18,16 +18,16 @@ def load_gene_order(path):
 
 # Create edge list from curated_interaction_edges.json, using index dictionary to convert gene names to positions
 def load_edges(path, idx_dict):
-  with open(path) as f:
-    edges = json.load(f)
-  edges = pd.DataFrame(edges, columns=["gene_a", "gene_b", "weight"])
+    with open(path) as f:
+      edges = json.load(f)
+    edges = pd.DataFrame(edges, columns=["gene_a", "gene_b", "weight"])
 
-  # source (gene_a) and target (gene_b), and weight columns
-  edges["a"] = [idx_dict[g] for g in edges["gene_a"]]
-  edges["b"] = [idx_dict[g] for g in edges["gene_b"]]
-  edges["weight"] = edges["weight"].astype(float)
+    # source (gene_a) and target (gene_b), and weight columns
+    edges["a"] = [idx_dict[g] for g in edges["gene_a"]]
+    edges["b"] = [idx_dict[g] for g in edges["gene_b"]]
+    edges["weight"] = edges["weight"].astype(float)
 
-  return edges
+    return edges
 
 # Build edge index and edge weight as torch tensors, with both directions for each edge
 def build_edge_index(edges):
