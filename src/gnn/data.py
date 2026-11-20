@@ -4,11 +4,11 @@ import numpy as np
 import torch
 
 # load expression (indexed by cell line), responses, and folds
-def load_tables(folder):
+def load_tables(folder, folds_file="folds.csv"):
     folder = Path(folder)
     expr = pd.read_csv(folder / "CellLinesLandmarkGenes.csv", index_col=0)
     responses = pd.read_csv(folder / "responses.csv")
-    folds = pd.read_csv((folder / "folds.csv"))
+    folds = pd.read_csv((folder / folds_file))
     return expr, responses, folds
 
 # Return one row per tested cell line for this drug: cell_line, ln_ic50, fold

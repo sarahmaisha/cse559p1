@@ -22,6 +22,9 @@ uv run python src/gnn/prepare_real.py
 uv run python src/gnn/run_gnn.py
 
 # 3. summary tables
-uv run python src/gnn/summarize.py results/predictions/gnn_real_v2.csv
+uv run python src/gnn/summarize.py results/predictions/gnn_real_v3_.csv
+
+uv run python src/gnn/summarize.py results/predictions/gnn_real_v3_teamfolds.csv
+
 
 
