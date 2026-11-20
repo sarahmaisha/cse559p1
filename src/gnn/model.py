@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch_geometric.nn import GCNConv
 
 class GeneGCN(nn.Module):
-  def __init__(self, edge_index, edge_weight, n_genes, emb=8, hidden=16, dropout=0.3):
+  def __init__(self, edge_index, edge_weight, n_genes, emb=8, hidden=16, dropout=0.3, skip=False):
     super().__init__()
     # store edge_index and edge_weight as buffers so that they stay fixed
     # bc values stay same for every cell line
@@ -25,6 +25,13 @@ class GeneGCN(nn.Module):
 
     # output layer: combine all genes features into one prediction per cell line
     self.out = nn.Linear(n_genes * hidden, 1)
+
+    # direct linear prediction from raw gene expression
+    # added to the graph prediction
+    self.use_skip = skip
+    if skip:
+      self.skip = nn.Linear(n_genes, 1)
+
 
   # build list of features for every gene
   #   parameter - x: [batch, n_genes]
@@ -52,8 +59,10 @@ class GeneGCN(nn.Module):
     h = h.flatten(1)
     h = self.drop(h)
     pred = self.out(h)
-
+    if self.use_skip:
+      pred = pred + self.skip(x)
     return pred
+
 
 
 
