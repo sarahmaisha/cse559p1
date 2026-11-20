@@ -11,8 +11,8 @@ from train import fit, predict
 from metrics import all_metrics
 from checkpoint import save_checkpoint
 
-DATA = Path("data/real/curated_data")
-RUN_NAME = "gnn_real"
+DATA = Path("data/real_v2/curated_data")
+RUN_NAME = "gnn_real_v2"
 MODEL_DIR = Path("results/models") / RUN_NAME
 SEED = 0
 EDGE_SCALE = 1000.0

@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-FOLDER = Path("data/real/curated_data")
+FOLDER = Path("data/real_v2/curated_data")
 SEED = 559
 N_FOLDS = 5
 
