@@ -96,6 +96,8 @@ def load_data():
 
 def main():
     data=load_data()
+    # our control grp
+    data={d:data[d]for d in [1909,1017,1558,1507,1054,1593]}
     results,coefs=all_drugs(data)
     results_df=pd.DataFrame(results)
     results_df.to_csv("results/baseline.csv",index=False)
