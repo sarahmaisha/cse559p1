@@ -14,6 +14,8 @@ def mapCellLinesToTargetGenes():
 
     # Keep only landmark
     curated_landmark_df = landmark_df[landmark_df['Type'] == 'landmark']
+    # bug fix: genes we actually have expression for; columns look like "BRAF (12345)", first column is the cell line ID
+    # targets are checked against this (not LandmarkGenes.txt) so a target in DepMap but outside the L1000 file isn't dropped
     depmap_symbols = {col.strip().split()[0] for col in cell_line_df.columns[1:]}
     curated_gene_symbols = set(curated_landmark_df["Symbol"])
     print(f"Number of genes from landmark set: {len(curated_gene_symbols)}")
@@ -25,9 +27,10 @@ def mapCellLinesToTargetGenes():
     for index, item in response_df.iterrows():
         val = item['PUTATIVE_TARGET']
         if isinstance(val, str):
+            # bug fix: add strip each target: GDSC lists them as "PARP1, PARP2", so " PARP2" ( with leading space) never matches and gets removed
             targets = [t.strip() for t in val.split(",")]
             for target in targets:
-                # assumes gene_symbols contains every gene symbol we have
+                # bug fix: keep targets we have DepMap expression for
                 if target in depmap_symbols:
                     putative_target_genes.add(target)
                 else:
