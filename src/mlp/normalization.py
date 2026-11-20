@@ -11,8 +11,4 @@ def normalize_data(X_train, X_other): #
 
     X_other_scaled = scaler.transform(X_other)
 
-    return (
-        X_train_scaled.astype(np.float32),
-        X_other_scaled.astype(np.float32),
-        scaler
-    )
+    return (X_train_scaled, X_other_scaled, scaler)
