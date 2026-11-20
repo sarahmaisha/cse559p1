@@ -14,7 +14,7 @@ def mapCellLinesToTargetGenes():
 
     # Keep only landmark
     curated_landmark_df = landmark_df[landmark_df['Type'] == 'landmark']
-    gene_symbols = set(landmark_df["Symbol"])
+    depmap_symbols = {col.strip().split()[0] for col in cell_line_df.columns[1:]}
     curated_gene_symbols = set(curated_landmark_df["Symbol"])
     print(f"Number of genes from landmark set: {len(curated_gene_symbols)}")
 
@@ -25,10 +25,10 @@ def mapCellLinesToTargetGenes():
     for index, item in response_df.iterrows():
         val = item['PUTATIVE_TARGET']
         if isinstance(val, str):
-            targets = val.strip().split(",")
+            targets = [t.strip() for t in val.split(",")]
             for target in targets:
                 # assumes gene_symbols contains every gene symbol we have
-                if target in gene_symbols:
+                if target in depmap_symbols:
                     putative_target_genes.add(target)
                 else:
                     exempt_targets.add(target)
