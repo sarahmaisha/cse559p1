@@ -51,9 +51,9 @@ class GeneGCN(nn.Module):
     # flatten, dropout, output
     h = h.flatten(1)
     h = self.drop(h)
-    h = self.out(h)
+    pred = self.out(h)
 
-    return h
+    return pred
 
 
 
