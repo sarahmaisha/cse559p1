@@ -4,6 +4,7 @@ import numpy as np
 
 path_to_raw_data = Path("raw_datasets")
 path_to_curated_data = Path("curated_data")
+path_to_responses = Path("curated_data/responses")
 
 # Gets a curated gene panel for each cell line, which includes landmark genes and drug targets.
 def mapCellLinesToTargetGenes():
@@ -62,5 +63,9 @@ def mapCellLineTolnc50():
     response_model_merge = pd.merge(response_df, model_df, left_on="SANGER_MODEL_ID", right_on="SangerModelID").drop(columns=["SangerModelID"])
     response_cell_line_merge = pd.merge(cell_line_df,response_model_merge, left_on=cell_line_df.columns[0], right_on="ModelID")
 
-    print(f"Result is dataframe with {response_cell_line_merge.shape[0]} items and {response_cell_line_merge.shape[1]} columns")
-    response_cell_line_merge.to_parquet(path_to_curated_data / "ResponseCellLineMerge.parquet", index=False)
+    response_cell_line_merge = response_cell_line_merge[['SANGER_MODEL_ID', 'DRUG_NAME', 'DRUG_ID', 'LN_IC50', 'ModelID']]
+    
+    for id in response_cell_line_merge['DRUG_ID'].unique():
+        drug_specific_responses = response_cell_line_merge[response_cell_line_merge['DRUG_ID'] == id]
+        drug_specific_responses.to_csv(path_to_responses / f"{id}.csv", index=False)
+    response_cell_line_merge.to_csv(path_to_curated_data / "ResponseCellLineMerge.csv", index=False)

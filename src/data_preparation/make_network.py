@@ -19,11 +19,13 @@ def construct_graph(sanger_id) -> nx.Graph:
 
 # Returns normalized value for transcripts per million
 def normalize_tpm_value(tpm_value, tpm_max, tpm_min):
-    return (tpm_value - tpm_min) / (tpm_max - tpm_min)
+    #return (tpm_value - tpm_min) / (tpm_max - tpm_min)
+    return tpm_value
 
 # Returns float value of ppi score
 def normalize_interaction_score(score):
-    return score / 1000.0
+    #return score / 1000.0
+    return score
 
 # writes a list of interactions greater than the cutoff. Scores are renormalized
 def write_curated_interaction_list():
@@ -33,8 +35,8 @@ def write_curated_interaction_list():
             simplified_interaction_list = []
             for interaction in interaction_list:
                 score = interaction[2]["combined_score"]
-                if score > INTERACTION_CUTOFF:
-                    renormalized_score = round((score - INTERACTION_CUTOFF) / (1.0 - INTERACTION_CUTOFF),3)
+                if score > INTERACTION_CUTOFF * 1000:
+                    renormalized_score = score #round((score - INTERACTION_CUTOFF) / (1.0 - INTERACTION_CUTOFF),3)
                     simplified_interaction_list.append((interaction[0],interaction[1], renormalized_score))
         
     with open(path_to_curated_data / "curated_interaction_edges.json", "w") as file:
@@ -48,7 +50,7 @@ def write_gene_protein_network(sanger_id, genes):
 
 # Constructs all gene-protein networks from a list of cell lines
 def make_gene_protein_networks():
-    response_cell_line_df = pd.read_parquet(path_to_curated_data / "ResponseCellLineMerge.parquet")
+    response_cell_line_df = pd.read_csv(path_to_curated_data / "ResponseCellLineMerge.csv")
     cell_lines = pd.read_csv(path_to_curated_data / "CellLinesLandmarkGenes.csv")
     tpm_max = cell_lines.max(numeric_only=True).max()
     tpm_min = cell_lines.min(numeric_only=True).min()
