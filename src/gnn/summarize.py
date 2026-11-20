@@ -28,15 +28,22 @@ def main():
     preds = pd.read_csv(path)
 
     folds_tbl = per_fold(preds)
+    drug_tbl = per_drug(folds_tbl)
+    drug_tbl.columns = [f"{metric}_{stat}" for metric, stat in drug_tbl.columns]   # ("spearman","mean") → "spearman_mean"
+    pooled_tbl = pooled(preds)
+
     print(f"=== {path.name}: mean ± sd across folds ===")
-    print(per_drug(folds_tbl).round(3))
+    print(drug_tbl.round(3))
     print(f"\n=== {path.name}: pooled out-of-fold ===")
-    print(pooled(preds).round(3).to_string(index=False))
+    print(pooled_tbl.round(3).to_string(index=False))
 
     out = Path("results/metrics")
     out.mkdir(parents=True, exist_ok=True)
     folds_tbl.to_csv(out / f"{path.stem}_folds.csv", index=False)
-    print(f"\nsaved per-fold table to {out / (path.stem + '_folds.csv')}")
+    drug_tbl.round(3).to_csv(out / f"{path.stem}_by_drug.csv")              # keep index: it's the drug name
+    pooled_tbl.round(3).to_csv(out / f"{path.stem}_pooled.csv", index=False)
+    print(f"\nsaved {path.stem}_folds.csv, _by_drug.csv, _pooled.csv to {out}")
+
 
 if __name__ == "__main__":
     main()
