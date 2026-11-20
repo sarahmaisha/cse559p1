@@ -63,6 +63,12 @@ def fit(model, X_tr, y_tr, X_val, y_val, lr=1e-3, weight_decay=1e-4,
     print(f"best epoch {best_epoch}, val {best_val:.4f}")
     return model, history
 
+# returns predictions
+def predict(model, X):
+    model.eval()
+    with torch.no_grad():
+        return model(X).squeeze(-1).numpy()
+
 if __name__ == "__main__":
     from graph import load_gene_order, load_edges, build_edge_index
     from data import load_tables, prepare_fold

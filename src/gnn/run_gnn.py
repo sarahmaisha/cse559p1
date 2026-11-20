@@ -8,10 +8,16 @@ from data import load_tables, get_drug_rows, prepare_fold
 from model import GeneGCN
 from train import fit, predict
 from metrics import all_metrics
+from checkpoint import save_checkpoint
 
 DATA = Path("data/fake")  # need to change this later!!
 OUT = Path("results/predictions")
 SEED = 0
+
+# saved settings for the model
+MODEL_KW = dict(emb=8, hidden=16, dropout=0.3, skip=True)
+FIT_KW = dict(lr=1e-3, weight_decay=1e-4, max_epochs=200, patience=10)
+MODEL_DIR = Path("results/models/gnn")
 
 def main():
     # load everything once
@@ -27,9 +33,14 @@ def main():
             torch.manual_seed(SEED)
             # prepare this drug + fold
             (X_tr, y_tr, X_val, y_val, X_te, y_te), mu, sd = prepare_fold(drug, fold, expr, responses, folds)
-            model = GeneGCN(edge_index, edge_weight, n_genes=len(genes), skip=True)
-            model, _ = fit(model, X_tr, y_tr, X_val, y_val)
+            model = GeneGCN(edge_index, edge_weight, n_genes=len(genes), **MODEL_KW)
+            model, _ = fit(model, X_tr, y_tr, X_val, y_val, **FIT_KW)
             y_pred = predict(model, X_te)
+
+            # save model configuration
+            MODEL_DIR.mkdir(parents=True, exist_ok=True)
+            save_checkpoint(MODEL_DIR / f"{drug}_fold{fold}.pt", model, MODEL_KW,
+                            genes, mu, sd, drug, fold, SEED)
 
             test_lines = df.loc[df["fold"] == fold, "cell_line"].to_numpy()
             parts.append(pd.DataFrame({
