@@ -117,7 +117,7 @@ def main():
     for d in data:
         drugcoefs=[row for row in coefs if row["drug"]==d]
         ranked=rank_genes(drugcoefs)
-        row={"drug":d,"targets":",".join(target[d])}
+        row={"drug":d,"targets":"/".join(target[d])}
         row.update(targethit(ranked,target[d]))
         recovery.append(row)
 
