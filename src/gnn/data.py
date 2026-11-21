@@ -38,22 +38,12 @@ def split_fold(df, expr, fold, val_frac=0.2, seed=0):
     # test = this fold; rest = the other 4 folds
     is_test = (df["fold"] == fold).to_numpy()
     X_test, y_test = X[is_test], y[is_test]
-    X_rest, y_rest = X[~is_test], y[~is_test]
-
-    # fraction of the rest (val_frac) to be used for validation
-    rng = np.random.default_rng(seed)
-    order = rng.permutation(len(X_rest))
-    n_val = int(len(X_rest) * val_frac)
-    val_idx = order[:n_val]
-    train_idx = order[n_val:]
-
-    X_train, y_train = X_rest[train_idx], y_rest[train_idx]
-    X_val, y_val = X_rest[val_idx], y_rest[val_idx]
-
-    return X_train, y_train, X_val, y_val, X_test, y_test
+    X_train, y_train = X[~is_test], y[~is_test]
+    
+    return X_train, y_train, X_test, y_test
 
 # return mu, sd for saving
-def standardize(X_train, X_val, X_test):
+def standardize(X_train, X_test):
     # use training mean/std to prevent leaking
     mu = X_train.mean(axis=0)
     sd = X_train.std(axis=0)
@@ -63,10 +53,9 @@ def standardize(X_train, X_val, X_test):
 
     # standarize gene values
     X_train = (X_train - mu) / sd
-    X_val   = (X_val   - mu) / sd
     X_test  = (X_test  - mu) / sd
 
-    return X_train, X_val, X_test, mu, sd
+    return X_train, X_test, mu, sd
 
 # Convert each NumPy array to a float32 torch tensor
 def to_tensors(*arrays):
@@ -75,10 +64,9 @@ def to_tensors(*arrays):
 # combine all helper functions to prepare fold
 def prepare_fold(drug, fold, expr, responses, folds, val_frac=0.2, seed=0):
     df = get_drug_rows(drug, responses, folds)
-    X_tr, y_tr, X_val, y_val, X_te, y_te = split_fold(df, expr, fold, val_frac, seed)
-    X_tr, X_val, X_te, mu, sd = standardize(X_tr, X_val, X_te)
-    tensors = to_tensors(X_tr, y_tr, X_val, y_val, X_te, y_te)
-    return tensors, mu, sd
+    X_tr, y_tr, X_te, y_te = split_fold(df, expr, fold, val_frac, seed)
+    tensors = to_tensors(X_tr, y_tr, X_te, y_te)
+    return tensors
 
 if __name__ == "__main__":
     expr, responses, folds = load_tables("data/fake")

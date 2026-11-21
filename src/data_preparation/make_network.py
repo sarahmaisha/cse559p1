@@ -83,8 +83,7 @@ def build_interaction_list():
         
         if (n1, n2) in interaction_dict or (n1, n2) in interaction_dict:
             interaction_score = interaction_dict[(n1,n2)]
-            norm_score = normalize_interaction_score(interaction_score)
-            interaction_list.append((gene1, gene2, {"combined_score": norm_score}))
+            interaction_list.append((gene1, gene2, interaction_score))
         
     with open(path_to_curated_data / "interaction_edges.json", "w") as file:
         json.dump(interaction_list, file, indent=4)
