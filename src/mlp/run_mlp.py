@@ -95,7 +95,7 @@ def run_mlp(drug_id, data_dir, folds_file, results_dir):
             })
 
         # used for later SHAP analysis
-        torch.save(final_model.state_dict(), output_dir / f"model_fold_{fold}.pt")
+        #torch.save(final_model.state_dict(), output_dir / f"model_fold_{fold}.pt")
 
 
     # save the out of fold predictions
