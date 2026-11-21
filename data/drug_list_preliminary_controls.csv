@@ -1,0 +1,7 @@
+drug,name,targets,control_label
+1909,Venetoclax,BCL2,positive
+1017,Olaparib,"PARP1, PARP2",positive
+1558,Lapatinib,"EGFR, ERBB2",positive
+1507,Ruxolitinib,"JAK1, JAK2",positive
+1054,Palbociclib,"CDK4, CDK6",negative
+1593,Entinostat,"HDAC1, HDAC3",negative
