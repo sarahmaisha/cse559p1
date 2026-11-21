@@ -45,22 +45,28 @@ def fit(model, X_tr, y_tr, X_val, y_val, lr=1e-3, weight_decay=1e-4,
 
     for epoch in range(max_epochs):
         train_loss = train_one_epoch(model, optimizer, X_tr, y_tr, batch_size)
-        val_loss = evaluate(model, X_val, y_val)
-        history.append((epoch, train_loss, val_loss))
-        if verbose:
-            print(f"epoch {epoch:3d}  train {train_loss:.4f}  val {val_loss:.4f}")
+        
+        # Early stopping for inner_cv training, which uses a validation set
+        if X_val != None and y_val != None:
+            val_loss = evaluate(model, X_val, y_val)
+            history.append({"epoch": epoch, "best_epoch": best_epoch, "train_loss": train_loss, "val_loss": val_loss})
+            if verbose:
+                print(f"epoch {epoch:3d}  train {train_loss:.4f}  val {val_loss:.4f}")
 
-        if val_loss < best_val:
-            # new best: update best_val, best_epoch, and snapshot the weights
-            best_val = val_loss
-            best_epoch = epoch
-            best_state = copy.deepcopy(model.state_dict())
+            if val_loss < best_val:
+                # new best: update best_val, best_epoch, and snapshot the weights
+                best_val = val_loss
+                best_epoch = epoch
+                best_state = copy.deepcopy(model.state_dict())
 
-        elif epoch - best_epoch >= patience:
-            # no improvement
-            break
-    model.load_state_dict(best_state)
-    print(f"best epoch {best_epoch}, val {best_val:.4f}")
+            elif epoch - best_epoch >= patience:
+                # no improvement
+                break
+            
+    if best_state != None:
+        model.load_state_dict(best_state)
+        print(f"best epoch {best_epoch}, val {best_val:.4f}")
+        
     return model, history
 
 # returns predictions
