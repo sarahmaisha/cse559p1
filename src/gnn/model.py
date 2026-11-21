@@ -3,12 +3,15 @@ import torch.nn as nn
 from torch_geometric.nn import GCNConv
 
 class GeneGCN(nn.Module):
-  def __init__(self, edge_index, edge_weight, n_genes, emb=8, hidden=16, dropout=0.3, skip=False):
+  def __init__(self, edge_index, edge_weight, n_genes, emb=8, hidden=16, dropout=0.3, edge_weight_threshold=0.75, skip=False):
     super().__init__()
     # store edge_index and edge_weight as buffers so that they stay fixed
     # bc values stay same for every cell line
-    self.register_buffer("edge_index", edge_index)
-    self.register_buffer("edge_weight", edge_weight)
+    keep = edge_weight >= edge_weight_threshold
+    filtered_edge_index = edge_index[:, keep]
+    filtered_edge_weight = edge_weight[keep]
+    self.register_buffer("edge_index", filtered_edge_index)
+    self.register_buffer("edge_weight", filtered_edge_weight)
 
     # create gene embeddings
     # a Parameter of shape [n_genes, emb],

@@ -25,15 +25,22 @@ EDGE_SCALE = 1000.0
 
 # Hyperparameters to tune during nested cross-validation
 param_grid = [
-    ({"emb": 8,  "hidden": 8,  "dropout": 0.2}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
-    # ({"emb": 8,  "hidden": 16, "dropout": 0.3}, {"lr": 1e-3, "weight_decay": 1e-4 "patience": 10}),
-    # ({"emb": 12, "hidden": 16, "dropout": 0.4}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
-    # ({"emb": 16, "hidden": 16, "dropout": 0.3}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
-    # ({"emb": 16, "hidden": 32, "dropout": 0.4}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
-    # ({"emb": 8,  "hidden": 16, "dropout": 0.3}, {"lr": 5e-4, "weight_decay": 1e-4, "patience": 10}),
-    # ({"emb": 8,  "hidden": 16, "dropout": 0.3}, {"lr": 5e-3, "weight_decay": 1e-4, "patience": 10}),
-    # ({"emb": 8,  "hidden": 16, "dropout": 0.3}, {"lr": 1e-3, "weight_decay": 1e-3, "patience": 10}),
-    # ({"emb": 8,  "hidden": 16, "dropout": 0.3}, {"lr": 1e-3, "weight_decay": 1e-5, "patience": 10}),
+    ({"emb": 8,  "hidden": 8,  "dropout": 0.2, "edge_weight_threshold": 0.75}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 8,  "hidden": 16, "dropout": 0.3, "edge_weight_threshold": 0.75}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 12, "hidden": 16, "dropout": 0.4, "edge_weight_threshold": 0.75}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 16, "hidden": 16, "dropout": 0.3, "edge_weight_threshold": 0.75}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 16, "hidden": 32, "dropout": 0.4, "edge_weight_threshold": 0.75}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 8,  "hidden": 16, "dropout": 0.3, "edge_weight_threshold": 0.75}, {"lr": 5e-4, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 8,  "hidden": 16, "dropout": 0.3, "edge_weight_threshold": 0.75}, {"lr": 5e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 8,  "hidden": 16, "dropout": 0.3, "edge_weight_threshold": 0.75}, {"lr": 1e-3, "weight_decay": 1e-3, "patience": 10}),
+    ({"emb": 8,  "hidden": 16, "dropout": 0.3, "edge_weight_threshold": 0.75}, {"lr": 1e-3, "weight_decay": 1e-5, "patience": 10}),
+    
+    ({"emb": 8,  "hidden": 8,  "dropout": 0.2, "edge_weight_threshold": 0.0}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 8,  "hidden": 16, "dropout": 0.3, "edge_weight_threshold": 0.1}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 12, "hidden": 16, "dropout": 0.4, "edge_weight_threshold": 0.3}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 16, "hidden": 16, "dropout": 0.3, "edge_weight_threshold": 0.5}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 16, "hidden": 32, "dropout": 0.4, "edge_weight_threshold": 0.7}, {"lr": 1e-3, "weight_decay": 1e-4, "patience": 10}),
+    ({"emb": 8,  "hidden": 16, "dropout": 0.3, "edge_weight_threshold": 0.9}, {"lr": 5e-4, "weight_decay": 1e-4, "patience": 10}),
 ]
             
 OUT = Path("results/predictions")
@@ -43,7 +50,7 @@ FOLDS_FILE = "fold_assignments_team.csv"
 def main():
     # load everything once
     genes, idx = load_gene_order(DATA / "CellLinesLandmarkGenes.csv")
-    edge_index, edge_weight = build_edge_index(load_edges(DATA / "curated_interaction_edges.json", idx))
+    edge_index, edge_weight = build_edge_index(load_edges(DATA / "interaction_edges.json", idx))
     edge_weight = edge_weight / EDGE_SCALE
     expr, responses, folds = load_tables(DATA, FOLDS_FILE)
     drugs = pd.read_csv(DATA / "drug_list.csv")["drug"].to_list()
