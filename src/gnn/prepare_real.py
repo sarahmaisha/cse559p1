@@ -4,29 +4,26 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-FOLDER = Path("data/real/curated_data")
+FOLDER = Path("data/real_v2/curated_data")
 SEED = 559
 N_FOLDS = 5
 
 # Preliminary control subset (proposal classes), all with targets already in the current gene panel.
-# To be replaced by the rule-based drug list once the panel is rebuilt with all targets.
 CONTROLS = pd.DataFrame([
-    ("Venetoclax",  "BCL2",         "positive"),
-    ("Olaparib",    "PARP1, PARP2", "positive"),
-    ("Lapatinib",   "EGFR, ERBB2",  "positive"),
-    ("Ruxolitinib", "JAK1, JAK2",   "positive"),
-    ("Palbociclib", "CDK4, CDK6",   "negative"),
-    ("Entinostat",  "HDAC1, HDAC3", "negative"),
-], columns=["drug", "targets", "control_label"])
+    (1909, "Venetoclax",  "BCL2",         "positive"),
+    (1017, "Olaparib",    "PARP1, PARP2", "positive"),
+    (1558, "Lapatinib",   "EGFR, ERBB2",  "positive"),
+    (1507, "Ruxolitinib", "JAK1, JAK2",   "positive"),
+    (1054, "Palbociclib", "CDK4, CDK6",   "negative"),
+    (1593, "Entinostat",  "HDAC1, HDAC3", "negative"),
+], columns=["drug", "name", "targets", "control_label"])
 
+# One row per (DRUG_ID, cell line) -> drug, cell_line, ln_ic50
 def make_responses(raw):
-    """Merge drug IDs by name and average replicate screens -> drug, cell_line, ln_ic50."""
-    merged = raw.groupby(["DRUG_NAME", "ModelID"])["LN_IC50"].mean().reset_index()
-    merged = merged.rename(columns={"DRUG_NAME":"drug", "ModelID":"cell_line", "LN_IC50":"ln_ic50"})
-    return merged
+    return raw.rename(columns={"DRUG_ID": "drug", "ModelID": "cell_line", "LN_IC50": "ln_ic50"})[["drug", "cell_line", "ln_ic50"]]
 
+# Assign each cell line one fold (same for every drug) -> drug, cell_line, fold
 def make_folds(responses, seed=SEED, n_folds=N_FOLDS):
-    """Assign each cell line one fold (same for every drug) -> drug, cell_line, fold."""
     rng = np.random.default_rng(seed)
     cell_lines = sorted(responses["cell_line"].unique())
     shuffled = rng.permutation(cell_lines)
@@ -40,7 +37,12 @@ def main():
     expr_ids = set(pd.read_csv(FOLDER / "CellLinesLandmarkGenes.csv", usecols=[0]).iloc[:, 0])
 
     responses = make_responses(raw)
-    folds = make_folds(responses)
+
+    # folds = make_folds(responses)
+
+    # replace ^^ with fold assignments
+    folds = pd.read_csv(FOLDER.parent / "fold_assignments.csv").rename(columns={"DRUG_ID": "drug", "ModelID": "cell_line"})
+
 
     # sanity checks
     print("rows before merge:", len(raw), "| after merge:", len(responses))
@@ -50,9 +52,9 @@ def main():
     print(folds.drop_duplicates("cell_line")["fold"].value_counts().sort_index().to_dict())
 
     responses.to_csv(FOLDER / "responses.csv", index=False)
-    folds.to_csv(FOLDER / "folds.csv", index=False)
+    folds.to_csv(FOLDER / "fold_assignments_team.csv", index=False)
     CONTROLS.to_csv(FOLDER / "drug_list.csv", index=False)
-    print("wrote responses.csv, folds.csv, drug_list.csv to", FOLDER)
+    print("wrote responses.csv, fold_assignments_team.csv, drug_list.csv to", FOLDER)
 
 if __name__ == "__main__":
     main()

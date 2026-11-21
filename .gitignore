@@ -225,3 +225,6 @@ curated_data/
 graphs/
 data/
 results/
+
+# macOS stuff
+.DS_Store

@@ -11,8 +11,8 @@ from train import fit, predict
 from metrics import all_metrics
 from checkpoint import save_checkpoint
 
-DATA = Path("data/real/curated_data")
-RUN_NAME = "gnn_real"
+DATA = Path("data/real_v2/curated_data")
+RUN_NAME = "gnn_real_v3_teamfolds"
 MODEL_DIR = Path("results/models") / RUN_NAME
 SEED = 0
 EDGE_SCALE = 1000.0
@@ -21,6 +21,7 @@ EDGE_SCALE = 1000.0
 MODEL_KW = dict(emb=8, hidden=16, dropout=0.3, skip=True)
 FIT_KW = dict(lr=1e-3, weight_decay=1e-4, max_epochs=200, patience=10)
 OUT = Path("results/predictions")
+FOLDS_FILE = "fold_assignments_team.csv"
 
 
 def main():
@@ -28,7 +29,7 @@ def main():
     genes, idx = load_gene_order(DATA / "CellLinesLandmarkGenes.csv")
     edge_index, edge_weight = build_edge_index(load_edges(DATA / "curated_interaction_edges.json", idx))
     edge_weight = edge_weight / EDGE_SCALE
-    expr, responses, folds = load_tables(DATA)
+    expr, responses, folds = load_tables(DATA, FOLDS_FILE)
     drugs = pd.read_csv(DATA / "drug_list.csv")["drug"].to_list()
 
     parts = []
