@@ -54,10 +54,10 @@ See the baseline implementation in the repository for training and evaluation. T
 
 ### MLP (src/mlp):
 
-See [MLP README](src/mlp/README.md) for the training pipeline, normalization, cross-validation, and evaluation instructions.
+See [MLP README](src/mlp/README.md) for mlp model implementation.
 
 ### GNN (src/gnn):
 
-See [GNN README](src/gnn/README.md) for graph preparation, model training, and evaluation instructions.
+See [GNN README](src/gnn/README.md) for gnn model implementation.
 
 
