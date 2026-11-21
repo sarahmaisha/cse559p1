@@ -1,0 +1,7 @@
+drug,targets,hit@10,hit@25,hit@50,name,control_label
+1909,BCL2,True,True,True,Venetoclax,positive
+1017,"PARP1,PARP2",False,False,False,Olaparib,positive
+1558,"EGFR,ERBB2",True,True,True,Lapatinib,positive
+1507,"JAK1,JAK2",False,True,True,Ruxolitinib,positive
+1054,"CDK4,CDK6",False,False,False,Palbociclib,negative
+1593,"HDAC1,HDAC3",False,False,False,Entinostat,negative
