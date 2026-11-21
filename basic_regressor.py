@@ -77,7 +77,7 @@ def rank_genes(drugcoefs):
 def load_data():
     folds=pd.read_csv('data/fold_assignments.csv')
     response=pd.read_csv('data/curated_data/ResponseCellLineMerge.csv')
-    expression=pd.read_csv('data/curated_data/CellLinesLandmarkGenes.csv',index_col=0)
+    expression=pd.read_csv('data/curated_data/CellLinesLandmarkGenes.csv',index_col=0).rename(columns=lambda c: c.split(" (")[0])
 
     data={}
     # each unique drug id
@@ -93,15 +93,40 @@ def load_data():
         
     return data
 
+# checks if target gene in top 10 25 50 
+def targethit(ranked,target,k=(10,25,50)):
+    hit={}
+    for i in k:
+        topk=set(ranked.index[:i])
+        hit[f"hit@{i}"]=any(t in topk for t in target)
+    return hit
+
 
 def main():
     data=load_data()
     # our control grp
-    data={d:data[d]for d in [1909,1017,1558,1507,1054,1593]}
+    controls=pd.read_csv("data/drug_list_preliminary_controls.csv")
+    target=dict(zip(controls["drug"],controls["targets"].str.split(", ")))
+    data={d:data[d]for d in target}
     results,coefs=all_drugs(data)
+    # rq1
     results_df=pd.DataFrame(results)
-    results_df.to_csv("results/baseline.csv",index=False)
+    results_df.to_csv("data/results/baseline.csv",index=False)
+    # rq2
+    recovery=[]
+    for d in data:
+        drugcoefs=[row for row in coefs if row["drug"]==d]
+        ranked=rank_genes(drugcoefs)
+        row={"drug":d,"targets":",".join(target[d])}
+        row.update(targethit(ranked,target[d]))
+        recovery.append(row)
+
+    recover_df=pd.DataFrame(recovery).merge(controls[["drug","name","control_label"]],on="drug")
+    recover_df.to_csv("data/results/ridge_target_recovery.csv",index=False)
+
+
     print("Saved", len(results_df),"rows to baseline.csv")
+    print("Saved", len(recover_df),"rows to ridge_target_recovery.csv")
 
 if __name__=="__main__":
     main()
